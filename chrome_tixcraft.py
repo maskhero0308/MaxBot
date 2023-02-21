@@ -1270,7 +1270,7 @@ def tixcraft_date_auto_select(driver, url, config_dict, domain_name):
                     el = row.find_element(By.CSS_SELECTOR, 'button')
                 except Exception as exc:
                     if show_debug_message:
-                        print("find .btn-next fail")
+                        print("find buy button fail")
                     pass
 
                 if el is not None:
@@ -1312,7 +1312,7 @@ def tixcraft_date_auto_select(driver, url, config_dict, domain_name):
                 '''
                 is_date_selected = True
             except Exception as exc:
-                print("try to click .btn-next fail, force click by js.")
+                print("try to click buy button fail, force click by js.")
                 print(exc)
                 try:
                     driver.execute_script("arguments[0].click();", el)
@@ -1339,7 +1339,7 @@ def tixcraft_date_auto_select(driver, url, config_dict, domain_name):
                 # case 1: No hyperlink button.
                 el_list = None
                 try:
-                    el_list = driver.find_elements(By.CSS_SELECTOR, '.btn-next')
+                    el_list = driver.find_elements(By.CSS_SELECTOR, 'button')
                     if el_list is None:
                         driver.refresh()
                     else:

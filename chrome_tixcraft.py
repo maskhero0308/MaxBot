@@ -9906,7 +9906,7 @@ def ticketplus_order(driver, config_dict, ocr, Captcha_Browser):
         if is_price_assign_by_bot:
             if config_dict["ocr_captcha"]["enable"]:
                 # OCR alway guess wrong answer, disable for now.
-                # ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser)
+                ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser)
                 pass
 
 def ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser):
@@ -9931,6 +9931,31 @@ def ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser):
 
         if not is_need_redo_ocr:
             break
+
+import cv2
+import numpy as np
+
+def Base64_2_CV2(base64_str):
+    byte_data = base64.b64decode(base64_str)
+    encode_image = np.asarray(bytearray(byte_data), dtype="uint8")
+    img_array = cv2.imdecode(encode_image, cv2.IMREAD_COLOR)
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
+    return img_array
+
+
+def CV2_2_Base64(image):
+    base64_str = cv2.imencode('.jpg',image)[1].tostring()
+    # base64_str = base64.b64encode(base64_str)
+    return base64_str
+
+def ticketplus_ocr_handler(verifyCode_base64):
+    cvimg = Base64_2_CV2(verifyCode_base64.split(',')[1])
+    trans_mask = cvimg[:,:,2] == 0
+    cvimg[trans_mask] = [255, 255, 255]
+    cvimg = cv2.cvtColor(cvimg, cv2.COLOR_BGRA2BGR)
+    new_img = CV2_2_Base64(cvimg)
+    return new_img
+
 
 def ticketplus_auto_ocr(driver, config_dict, ocr, away_from_keyboard_enable, previous_answer, Captcha_Browser, ocr_captcha_image_source):
     show_debug_message = True       # debug.
@@ -9994,7 +10019,7 @@ svgToPng(svg, (imgData) => {
   callback(imgData);
 });
                     """ % (image_id))
-                img_base64 = base64.b64decode(form_verifyCode_base64.split(',')[1])
+                img_base64 = ticketplus_ocr_handler(form_verifyCode_base64)
             except Exception as exc:
                 if show_debug_message:
                     print("canvas exception:", str(exc))

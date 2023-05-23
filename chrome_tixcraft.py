@@ -9906,7 +9906,7 @@ def ticketplus_order(driver, config_dict, ocr, Captcha_Browser):
         if is_price_assign_by_bot:
             if config_dict["ocr_captcha"]["enable"]:
                 # OCR alway guess wrong answer, disable for now.
-                ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser)
+                # ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser)
                 pass
 
 def ticketplus_order_ocr(driver, config_dict, ocr, Captcha_Browser):

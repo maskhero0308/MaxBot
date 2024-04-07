@@ -10968,7 +10968,7 @@ def main(args):
 
         # for kktix.cc and kktix.com
         if 'kktix.c' in url:
-            kktix_dict = kktix_main(driver, url, config_dict, kktix_dict)
+            kktix_dict, is_quit_bot = kktix_main(driver, url, config_dict, kktix_dict)
 
         if 'famiticket.com' in url:
             fami_dict = famiticket_main(driver, url, config_dict, fami_dict)

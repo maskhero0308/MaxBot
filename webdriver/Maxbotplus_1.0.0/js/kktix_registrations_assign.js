@@ -1,7 +1,5 @@
-$("footer").remove();
-$("div.banner-wrapper div.img-wrapper img").remove();
-
 var myInterval = null;
+var checkboxInterval = null;
 //console.log("assign appear");
 
 function kktix_verification_conditions(settings)
@@ -37,6 +35,14 @@ function kktix_verification_conditions(settings)
     return is_text_sent;
 }
 
+function kktix_agree()
+{
+    $('input[type=checkbox]:not(:checked)').each(function() {
+        $(this).click();
+        if(checkboxInterval) clearInterval(checkboxInterval);
+    });
+}
+
 function kktix_area_keyword(settings, base_info, register_info)
 {
     let area_keyword_array = [];
@@ -49,10 +55,11 @@ function kktix_area_keyword(settings, base_info, register_info)
     }
     // console.log(area_keyword_array);
     let target_area = null;
+    let matched_block=[];
+    let query_string = "div.ticket-unit";
     if(area_keyword_array.length) {
         for (let i = 0; i < area_keyword_array.length; i++) {
-            let matched_block=[];
-            $("div.ticket-unit").each(function ()
+            $(query_string).each(function ()
             {
                 let html_text=$(this).text();
                 if(html_text.indexOf(area_keyword_array[i])>-1) {
@@ -67,8 +74,7 @@ function kktix_area_keyword(settings, base_info, register_info)
             }
         }
     } else {
-        let matched_block=[];
-        $("div.ticket-unit").each(function ()
+        $(query_string).each(function ()
         {
             matched_block.push($(this));
         });
@@ -80,13 +86,6 @@ function kktix_area_keyword(settings, base_info, register_info)
         let link_id = first_node.attr("id");
         //console.log("link_id: " + link_id);
         if(link_id) {
-            $('input[type=checkbox]').each(function() {
-                //$(this).prop('checked', true);
-                if(!$(this).is(':checked')) {
-                    $(this).click();
-                }
-            });
-
             let seat_inventory_key=link_id.split("_")[1];
             //console.log("seat_inventory_key:"+seat_inventory_key);
             let seat_inventory_number=register_info.inventory.seatInventory[seat_inventory_key];
@@ -140,16 +139,19 @@ function kktix_area_keyword(settings, base_info, register_info)
                     add_button.click();
                 }
 
-                let auto_click_next_btn = true;
+                let auto_click_next_btn = settings.kktix.auto_press_next_step_button;
 
-                if(is_verification_conditions_popup) {
-                    auto_click_next_btn = false;
-                    let is_text_sent = kktix_verification_conditions(settings);
-                    if(is_text_sent) {
-                        auto_click_next_btn = true;
+                if(auto_click_next_btn) {
+                    if(is_verification_conditions_popup) {
+                        auto_click_next_btn = false;
+                        let is_text_sent = kktix_verification_conditions(settings);
+                        if(is_text_sent) {
+                            auto_click_next_btn = true;
+                        }
                     }
                 }
 
+                let hide_other_row = false;
                 if(auto_click_next_btn) {
                     let $next_btn = $('div.register-new-next-button-area > button');
                     if($next_btn) {
@@ -157,6 +159,17 @@ function kktix_area_keyword(settings, base_info, register_info)
                             $next_btn.last().click();
                         } else {
                             $next_btn.click();
+                        }
+                        hide_other_row = true;
+                    }
+                }
+
+                // due to racing with web driver.
+                if(hide_other_row) {
+                    for (let i = 0; i < matched_block.length; i++) {
+                        if(target_area!=matched_block[i])
+                        {
+                            matched_block[i].remove();
                         }
                     }
                 }
@@ -199,8 +212,15 @@ if(rootElement) {
     if(!dom_ready()) {
         myInterval = setInterval(() => {
             dom_ready();
-        }, 1000);
+        }, 200);
+        
+        checkboxInterval= setInterval(() => {
+            //console.log("kktix_agree")
+            kktix_agree();
+        }, 200);
     }
+    $("footer").remove();
+    $("div.banner-wrapper div.img-wrapper img").remove();
 }
 
 

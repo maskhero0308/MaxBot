@@ -209,7 +209,8 @@
         },
         {
             "matches": [
-                "https://kham.com.tw/application/UTK02/UTK0204_.aspx?*"
+                "https://kham.com.tw/application/UTK02/UTK0204_.aspx?*",
+                "https://kham.com.tw/application/UTK02/UTK0201_000.aspx?PERFORMANCE_ID=*&PRODUCT_ID=*"
             ],
             "run_at": "document_end",
             "js": [
@@ -319,7 +320,7 @@
         },
         {
             "matches": [
-                "https://msg.cityline.com/*",
+                "https://msg.cityline.com/*.html*",
                 "https://*.cityline.com/utsvInternet/*/home?lang=TW",
                 "https://event.cityline.com/",
                 "https://event.cityline.com/queue?loc=*"
@@ -333,27 +334,42 @@
         },
         {
             "matches": [
-                "https://*.cityline.com/utsvInternet/internet/eventDetail?event=*",
+                "https://*.cityline.com/utsvInternet/*/eventDetail?event=*",
                 "https://*.cityline.com/utsvlnternet/*/login?lang=TW"
             ],
             "run_at": "document_end",
+            "world": "MAIN",
             "js": [
-                "jquery.min.js",
-                "js/cityline_event_common.js"
+                "js/cityline_event_detail.js"
             ]
         },
         {
             "matches": [
                 "https://shows.cityline.com/tc/*",
-                "https://priority.cityline.com/tc/*",
                 "https://shows.cityline.com/en/*",
-                "https://priority.cityline.com/en/*"
+                "https://priority.cityline.com/tc/*",
+                "https://priority.cityline.com/en/*",
+                "https://sports.cityline.com/tc/*",
+                "https://sports.cityline.com/en/*",
+                "https://cultural.cityline.com/tc/*",
+                "https://cultural.cityline.com/en/*"
             ],
             "run_at": "document_end",
             "world": "MAIN",
             "js": [
                 "jquery.min.js",
                 "js/cityline_shows_buy_front.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://venue.cityline.com/utsvInternet/*/performance?*"
+            ],
+            "run_at": "document_end",
+            "js": [
+                "jquery.min.js",
+                "js/common.js",
+                "js/cityline_performance.js"
             ]
         },
         {
@@ -418,5 +434,5 @@
             ]
         }
     ],
-    "version": "1.0.18"
+    "version": "1.0.23"
 }

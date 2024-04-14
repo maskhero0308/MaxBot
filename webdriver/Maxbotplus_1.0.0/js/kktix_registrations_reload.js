@@ -2,7 +2,7 @@ const storage = chrome.storage.local;
 var settings = null;
 var myInterval = null;
 
-function kktix_clean_exclude(settings, register_info) 
+function kktix_clean_exclude(settings)
 {
     let exclude_keyword_array = [];
     if(settings) {
@@ -41,7 +41,7 @@ function clean_sold_out_row(register_info, base_info)
                 match_target = true;
                 break;
             }
-            
+
         }
     }
     //console.log("match_target:"+match_target);
@@ -63,7 +63,7 @@ function clean_sold_out_row(register_info, base_info)
             $("body").append(register_info_div);
             let base_info_div="<div style='display:none' id='base_info'>" + JSON.stringify(base_info) + "</div>";
             $("body").append(base_info_div);
-            kktix_clean_exclude(settings, register_info);
+            kktix_clean_exclude(settings);
             //kktix_area_keyword(settings, register_info);
         }
     }
@@ -93,30 +93,38 @@ function kktix_ajax_return_register_info(register_info)
         if(settings) {
             auto_reload_page_interval = settings.advanced.auto_reload_page_interval;
         }
+        // memory not able to release soon.
+        if (auto_reload_page_interval < 0.23) {
+            auto_reload_page_interval = 0.23;
+        }
         const rootElement = document.documentElement;
         rootElement.remove();
         register_info=null;
         settings = null;
-        myInterval = null;        
+        myInterval = null;
+        for (var key in window) {
+            key=null;
+            delete key;
+        }        
         if(auto_reload_page_interval == 0) {
             //console.log('Start to reload now.');
-            location.reload();
+            window.location.reload();
         } else {
             //console.log('We are going to reload after few seconeds.');
             setTimeout(function () {
-                location.reload();
+                window.location.reload();
             }, auto_reload_page_interval * 1000);
         }
     }
     else {
         kktix_event_base_info(register_info);
-        kktix_force_auto_reload_by_timer()
+        kktix_force_auto_reload_by_timer();
     }
 }
 
 function kktix_event_base_info(register_info)
 {
-    const currentUrl = window.location.href; 
+    const currentUrl = window.location.href;
     const event_code = currentUrl.split('/')[4];
     //console.log(currentUrl);
     //console.log(event_code);
@@ -140,7 +148,7 @@ function kktix_event_base_info(register_info)
 
 function kktix_event_register_info()
 {
-    const currentUrl = window.location.href; 
+    const currentUrl = window.location.href;
     const event_code = currentUrl.split('/')[4];
     //console.log(currentUrl);
     //console.log(event_code);
@@ -162,7 +170,7 @@ function kktix_event_register_info()
     }
 }
 
-function kktix_force_auto_reload_by_timer() 
+function kktix_force_auto_reload_by_timer()
 {
     if(settings) {
         //console.log("auto reload for kktix");
@@ -173,8 +181,8 @@ function kktix_force_auto_reload_by_timer()
             }
             if(max_dwell_time <= 10) {
                 max_dwell_time = 10;
-            }        
-            //console.log('We are going to reload after few seconeds.');
+            }
+            console.log('We are going to force reload after few seconeds.');
             setTimeout(function () {
                 location.reload();
             }, max_dwell_time * 1000);
@@ -194,7 +202,15 @@ storage.get('status', function (items)
 {
     if (items.status && items.status=='ON')
     {
-        kktix_event_register_info();
+        let kktix_status_api = false;
+        if(settings) {
+            kktix_status_api = settings.advanced.kktix_status_api;
+        }
+        if(kktix_status_api) {
+            kktix_event_register_info();
+        } else {
+            kktix_force_auto_reload_by_timer();
+        }
     } else {
         //console.log('maxbot status is not ON');
     }

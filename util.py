@@ -6,9 +6,9 @@ import platform
 import random
 import re
 import socket
+import subprocess
 import sys
 import threading
-import subprocess
 from typing import Optional
 
 import requests
@@ -473,11 +473,12 @@ def dump_settings_to_maxbot_plus_extension(ext, config_dict, CONST_MAXBOT_CONFIG
 
     if len(local_remote_url_array) > 0:
         is_manifest_changed = False
-        for remote_url_final in local_remote_url_array:
-            if not remote_url_final in manifest_dict["host_permissions"]:
-                #print("local remote_url not in manifest:", remote_url_final)
-                manifest_dict["host_permissions"].append(remote_url_final)
-                is_manifest_changed = True
+        if 'host_permissions' in manifest_dict:
+            for remote_url_final in local_remote_url_array:
+                if not remote_url_final in manifest_dict["host_permissions"]:
+                    #print("local remote_url not in manifest:", remote_url_final)
+                    manifest_dict["host_permissions"].append(remote_url_final)
+                    is_manifest_changed = True
 
         if is_manifest_changed:
             json_str = json.dumps(manifest_dict, indent=4)
@@ -1869,7 +1870,7 @@ def kktix_get_registerStatus(event_code):
         print("send reg_info request fail:")
         print(exc)
 
-    registerStatus = None
+    registerStatus = ""
     if not html_result is None:
         status_code = html_result.status_code
         #print("status_code:",status_code)
@@ -1913,7 +1914,7 @@ def get_kktix_status_by_url(url):
             #print(registerStatus)
     return registerStatus
 
-def launch_maxbot(script_name="chrome_tixcraft", filename="", homepage="", kktix_account = "", kktix_password="", window_size=""):
+def launch_maxbot(script_name="chrome_tixcraft", filename="", homepage="", kktix_account = "", kktix_password="", window_size="", headless=""):
     cmd_argument = []
     if len(filename) > 0:
         cmd_argument.append('--input=' + filename)
@@ -1925,6 +1926,8 @@ def launch_maxbot(script_name="chrome_tixcraft", filename="", homepage="", kktix
         cmd_argument.append('--kktix_password=' + kktix_password)
     if len(window_size) > 0:
         cmd_argument.append('--window_size=' + window_size)
+    if len(headless) > 0:
+        cmd_argument.append('--headless=' + headless)
 
     working_dir = os.path.dirname(os.path.realpath(__file__))
     if hasattr(sys, 'frozen'):

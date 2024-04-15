@@ -740,7 +740,7 @@ async def nodriver_kktix_reg_new_main(tab, config_dict, fail_list, played_sound_
             is_need_refresh_final = True
 
             for area_keyword_item in area_keyword_array:
-                is_need_refresh_tmp = Falses
+                is_need_refresh_tmp = False
                 is_dom_ready, is_ticket_number_assigned, is_need_refresh_tmp = await nodriver_kktix_assign_ticket_number(tab, config_dict, area_keyword_item)
 
                 if not is_dom_ready:
